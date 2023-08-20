@@ -1,26 +1,21 @@
 <template>
-  <l-map
-    style="height: 100vh"
-    :zoom="zoom"
-    :center="center"
-  >
-    <l-tile-layer
-      :url="url"
-      :attribution="attribution"
-    ></l-tile-layer>
+  <l-map style="height: 100vh; width: 80vw" :zoom="zoom" :center="center">
+    <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
 
     <l-circle-marker
       v-for="info in INFO"
       :lat-lng="createdPoint(info.geometry.coordinates)"
       :color="circle.color"
       :radius="circle.radius"
-    ></l-circle-marker>
-
+      @click="showInfo(info)"
+    >
+      <l-popup>{{ infoAbDot }}</l-popup>
+    </l-circle-marker>
   </l-map>
 </template>
 
 <script>
-import { LMap, LTileLayer, LMarker, LCircleMarker, LPolygon, LGeoJson } from 'vue2-leaflet';
+import { LMap, LTileLayer, LMarker, LCircleMarker, LPolygon, LGeoJson, LPopup } from 'vue2-leaflet';
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
@@ -30,7 +25,8 @@ export default {
     LMarker,
     LCircleMarker,
     LPolygon,
-    LGeoJson
+    LGeoJson,
+    LPopup,
   },
   data() {
     return {
@@ -41,21 +37,20 @@ export default {
       center: [52.608826, 39.599229],
       circle: {
         color: 'red',
-        radius: 6
-      }
-
+        radius: 6,
+      },
+      infoAbDot: '',
     };
   },
   computed: {
-    ...mapGetters(['INFO'])
+    ...mapGetters(['INFO']),
   },
   mounted() {
-    this.GET_INFO_FROM_API()
+    this.GET_INFO_FROM_API();
   },
   beforeUpdated() {
     // Отрисовываем точки
-    this.createdPoint()
-
+    this.createdPoint();
   },
   methods: {
     // Получаем данные из VUEX
@@ -65,11 +60,13 @@ export default {
       // Делаем проверку на тип (Длинна 1 - Полигон, 2 - точка)
       if (point.length === 2) {
         // Переворачиваем местами массив с точками, потому что он приходит не в том виде
-        return [point[1], point[0]]
+        return [point[1], point[0]];
       }
     },
-
+    // Получение информации о точке
+    showInfo(info) {
+      return (this.infoAbDot = `${info.properties.info.Адрес} \n${info.properties.info.Наименование}`);
+    },
   },
-
-}
+};
 </script>

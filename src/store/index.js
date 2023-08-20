@@ -18,20 +18,22 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    GET_INFO_FROM_API({ commit }) {
-      return axios('https://api-invest.admlr.lipetsk.ru/api/invest/get_filtered_objects2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    async GET_INFO_FROM_API({ commit }) {
+      const info = await axios(
+        'https://api-invest.admlr.lipetsk.ru/api/invest/get_filtered_objects2?_page=1&_limit=20',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          data: {
+            objects: true,
+            sez: [227, 228],
+          },
         },
-        data: {
-          objects: true,
-          sez: [227, 228],
-        },
-      }).then((info) => {
-        commit('SET_INFORMATION_TO_STATE', info.data);
-        return info;
-      });
+      );
+      commit('SET_INFORMATION_TO_STATE', info.data);
+      return info;
     },
   },
 });
